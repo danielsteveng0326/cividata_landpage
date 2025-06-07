@@ -23,12 +23,12 @@ COPY . .
 # Inicializar Reflex
 RUN reflex init
 
-# Crear script de inicio
+# Crear script de inicio mejorado
 RUN echo '#!/bin/bash\n\
 export BACKEND_PORT=${PORT:-3000}\n\
 export BACKEND_HOST=0.0.0.0\n\
 echo "Starting Reflex on port $BACKEND_PORT"\n\
-reflex run --env prod --backend-only --loglevel info' > start.sh && \
+exec reflex run --env prod --backend-only --loglevel info' > start.sh && \
 chmod +x start.sh
 
 EXPOSE 3000
