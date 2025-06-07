@@ -2,7 +2,6 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -14,16 +13,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-
-# Inicializar Reflex
 RUN reflex init
 
-# Railway asigna el puerto dinámicamente
+# Copiar y hacer ejecutable el script
+COPY start.sh .
+RUN chmod +x start.sh
+
+# Railway asignará el puerto mediante $PORT
 EXPOSE 8080
 
-# Configurar variables de entorno para Reflex
-ENV BACKEND_PORT=$PORT
-ENV BACKEND_HOST=0.0.0.0
-
-# Comando simplificado - Reflex usará las variables de entorno
-CMD reflex run --env prod --backend-only
+# Usar el script que maneja correctamente las variables
+CMD ["./start.sh"]
