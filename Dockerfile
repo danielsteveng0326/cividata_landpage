@@ -1,34 +1,24 @@
-FROM python:3.11-slim
+FROM python:3.11
 
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    curl \
-    unzip \
-    git \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar Node.js 18 (requerido por Reflex)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
+# Copiar y instalar dependencias
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar código
 COPY . .
 
-# Inicializar y construir el frontend
+# Inicializar Reflex
 RUN reflex init
-RUN reflex export --frontend-only
 
-# Script de inicio para modo producción completo
-RUN echo '#!/bin/bash\n\
-export PORT=${PORT:-3000}\n\
-echo "Starting Reflex on port $PORT"\n\
-exec reflex run --env prod --port $PORT --host 0.0.0.0' > start.sh && \
-chmod +x start.sh
-
+# Puerto que Railway asignará
 EXPOSE 3000
 
-CMD ["./start.sh"]
+# Comando directo sin script
+CMD reflex run --env prod --frontend-port ${PORT:-3000} --backend-port ${PORT:-3000} --host 0.0.0.0
