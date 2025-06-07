@@ -1,10 +1,4 @@
 #!/bin/bash
-# Railway provee PORT, no BACKEND_PORT
-if [ -n "$PORT" ]; then
-    export BACKEND_PORT=$PORT
-else
-    export BACKEND_PORT=8080
-fi
-
-echo "Starting Reflex on port $BACKEND_PORT"
-reflex run --env prod --backend-only
+PORT=${PORT:-3000}
+echo "Starting Reflex full stack on port $PORT"
+reflex run --env prod --frontend-port $PORT --backend-port $PORT --host 0.0.0.0
