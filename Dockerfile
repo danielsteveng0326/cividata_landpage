@@ -21,4 +21,4 @@ RUN reflex init
 EXPOSE 3000
 
 # Comando directo sin script
-CMD reflex run --env prod --frontend-port ${PORT:-3000} --backend-port ${PORT:-3000} --host 0.0.0.0
+CMD reflex run --env prod --frontend-port ${PORT:-3000} --backend-port ${PORT:-3000} --backend-host 0.0.0.0
