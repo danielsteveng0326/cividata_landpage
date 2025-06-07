@@ -2,25 +2,35 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Instalar dependencias del sistema necesarias
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     curl \
     unzip \
+    git \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
+# Copiar requirements primero para mejor cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar el resto del código
 COPY . .
+
+# Inicializar Reflex
 RUN reflex init
 
-# Copiar y hacer ejecutable el script
-COPY start.sh .
-RUN chmod +x start.sh
+# Crear script de inicio
+RUN echo '#!/bin/bash\n\
+export BACKEND_PORT=${PORT:-3000}\n\
+export BACKEND_HOST=0.0.0.0\n\
+echo "Starting Reflex on port $BACKEND_PORT"\n\
+reflex run --env prod --backend-only --loglevel info' > start.sh && \
+chmod +x start.sh
 
-# Railway asignará el puerto mediante $PORT
-EXPOSE 8080
+EXPOSE 3000
 
-# Usar el script que maneja correctamente las variables
 CMD ["./start.sh"]
