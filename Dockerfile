@@ -2,6 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Instalar dependencias del sistema que Reflex necesita
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -10,16 +11,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+
+# Instalar dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Inicializar y preparar para producción
+# Inicializar Reflex
 RUN reflex init
-RUN reflex export --frontend-only --no-zip
 
-# Puerto que Railway asignará
-EXPOSE 3000
+EXPOSE 8000
 
-# Ejecutar en modo producción
-CMD reflex run --env prod --loglevel info
+# Comando corregido con --backend-port
+CMD reflex run --env prod --backend-only --backend-port ${PORT:-8000} --backend-host 0.0.0.0
